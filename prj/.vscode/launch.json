@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "STM32 Debug",
+            "type": "cortex-debug",
+            "request": "launch",
+
+            "servertype": "external",
+
+            "executable": "${workspaceFolder}/build/fcm.elf",
+
+            "gdbTarget": "localhost:3333",
+
+            "cwd": "${workspaceFolder}",
+
+            "runToMain": true,
+
+            "gdbPath": "/usr/bin/gdb-multiarch"
+        }
+    ]
+}
