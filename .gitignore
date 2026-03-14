@@ -1,0 +1,102 @@
+# 编译输出文件
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.out
+*.elf.hex
+
+# 构建目录（根据你的 Makefile 配置）
+build/
+Build/
+Debug/
+Release/
+output/
+
+# 编辑器临时文件
+*~
+*.swp
+*.swo
+*.lock
+*.tmp
+
+# IDE 项目文件（如果你使用不同 IDE，可以保留对应部分）
+## VS Code
+.vscode/
+.code-workspace
+
+## CLion
+.idea/
+cmake-build-*/
+
+## Eclipse
+.cproject
+.project
+.settings/
+
+## Keil MDK
+*.uvoptx
+*.uvguix
+*.uvgui.*
+*.scvd
+*.uvproj
+*.uvopt
+*.uvmpw
+RTE/
+
+## IAR
+*.ewd
+*.ewp
+*.eww
+*.icf
+*.dep
+Debug/
+Release/
+
+## Atmel Studio
+*.atsln
+*.asprj
+*.cppproj
+Debug/
+Release/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 文档和日志
+*.log
+*.bak
+*.backup
+
+# 标签文件（如果使用 ctags 等）
+tags
+cscope.*
+
+# 第三方库/工具生成的临时文件
+*.orig
+*.rej
+
+# 模拟器/调试器缓存
+*.uvguix.*
+*.dbg
+*.launch
+
+# Python 虚拟环境（如果有）
+venv/
+env/
+__pycache__/
+*.pyc
+
+# 本地配置文件（例如用户自定义的 Makefile 片段）
+*.local
+*.user
+
+# 其他
+*.swp
+*.swo
+*~
