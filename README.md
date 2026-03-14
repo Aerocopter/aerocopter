@@ -1,16 +1,39 @@
-## Hi there 👋
+# Aerocopter Flight Controller
 
-<!--
-**Aerocopter/aerocopter** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-STM32F405-green.svg)
 
-Here are some ideas to get you started:
+Aerocopter is an open-source flight controller firmware for STM32F405-based autopilot systems. It provides robust drivers for sensors (including MS5611 barometer) and supports real-time data visualization via VOFA+ protocol. The project is built with ARM GCC toolchain and a custom Makefile, featuring a clean modular architecture for easy customization and expansion.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## Features
+
+- **MCU:** STM32F405 (Cortex-M4 with FPU, 168 MHz)
+- **Sensors:**
+  - MS5611 barometer (I2C) with temperature compensation
+  - Planned support for MPU6050/ICM-20948 IMU
+- **Communication:**
+  - UART with `printf` redirection for debugging
+  - VOFA+ FireWater & JustFloat protocols for 3D visualization
+- **Build System:** Makefile-based, using `arm-none-eabi-gcc` and newlib-nano
+- **Modular Architecture:** Clean separation of BSP, drivers (`mod/`), and application layers
+
+## Hardware Requirements
+
+- STM32F405 development board (e.g., F405VGT6)
+- MS5611 barometer module (I2C interface, address 0x77)
+- USB-to-TTL adapter (for UART debugging)
+- Optional: MPU6050 or other IMU
+
+## Software Requirements
+
+- **Toolchain:** GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`)
+- **Build Tool:** GNU Make
+- **Programming:** ST-Link utility or `dfu-util`
+- **Serial Monitor:** `screen`, `minicom`, or VOFA+ (for visualization)
+
+## Getting Started
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Aerocopter/aerocopter.git
+cd aerocopter
