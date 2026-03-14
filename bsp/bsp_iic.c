@@ -1,5 +1,8 @@
 #include "stm32f4xx.h"
 #include "bsp_iic.h"
+#include "CoOS.h"
+
+OS_MutexID i2c_mutex;
 
 /* =========================================================
    I2C3
@@ -40,6 +43,7 @@ void bsp_i2c3_init(void)
     I2C3->CCR   = 210;
     I2C3->TRISE = 43;
 
+    i2c_mutex = CoCreateMutex();   // 创建互斥量
     /* Enable I2C */
     I2C3->CR1 |= I2C_CR1_PE;
 }
@@ -83,17 +87,20 @@ static uint8_t i2c3_read_byte(uint8_t ack)
 
 void bsp_i2c3_write(uint8_t addr, uint8_t reg, uint8_t data)
 {
+    CoEnterMutexSection(i2c_mutex);   // 加锁
     i2c3_start();
     i2c3_send_addr(addr, 0);
     i2c3_write_byte(reg);
     i2c3_write_byte(data);
     i2c3_stop();
+    CoLeaveMutexSection(i2c_mutex);   // 解锁
 }
 
 uint8_t bsp_i2c3_read(uint8_t addr, uint8_t reg)
 {
     uint8_t data;
-
+    CoEnterMutexSection(i2c_mutex);   // 加锁
+    
     i2c3_start();
     i2c3_send_addr(addr, 0);
     i2c3_write_byte(reg);
@@ -103,11 +110,13 @@ uint8_t bsp_i2c3_read(uint8_t addr, uint8_t reg)
     data = i2c3_read_byte(0);
 
     i2c3_stop();
+    CoLeaveMutexSection(i2c_mutex);   // 解锁
     return data;
 }
 
 void bsp_i2c3_read_buffer(uint8_t addr, uint8_t reg, uint8_t *buf, uint16_t len)
 {
+    CoEnterMutexSection(i2c_mutex);   // 加锁
     i2c3_start();
     i2c3_send_addr(addr, 0);
     i2c3_write_byte(reg);
@@ -121,4 +130,5 @@ void bsp_i2c3_read_buffer(uint8_t addr, uint8_t reg, uint8_t *buf, uint16_t len)
     }
 
     i2c3_stop();
+    CoLeaveMutexSection(i2c_mutex);   // 解锁
 }
