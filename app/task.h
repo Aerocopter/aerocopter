@@ -5,7 +5,7 @@
 
 /* ================= Task Stack Size ================= */
 
-#define TASK_STK_SIZE   256
+#define TASK_STK_SIZE   1024
 
 /* ================= Public API ================= */
 

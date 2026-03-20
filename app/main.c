@@ -27,6 +27,7 @@
 #include "delay.h"
 #include "imu.h"
 #include "fc_status.h"
+#include "drv_w25q128.h"
 
 int main(void)
 {
@@ -34,12 +35,17 @@ int main(void)
 
     FC_SetStatus(FC_STATUS_UNARMED);
 
+    bsp_spi1_init(SPI_MODE_0);
     bsp_spi2_init(SPI_MODE_0);
     bsp_spi3_init(SPI_MODE_0);
-    uart_init(115200);
-    bsp_i2c3_init();
 
-    delay_ms(10);   // wait for PC serial ready
+    uart_init(115200);
+    delay_ms(100);   // wait for PC serial ready
+
+    if(w25q128_init())
+        printf("w25q128 init failed!\n");
+
+    bsp_i2c3_init();
     
     imu_init();
     imu_calibrate();

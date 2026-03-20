@@ -12,6 +12,7 @@ static OS_STK imu_stk[TASK_STK_SIZE];
 static OS_STK tel_stk[TASK_STK_SIZE];
 static OS_STK led_stk[TASK_STK_SIZE];
 static OS_STK pos_stk[TASK_STK_SIZE];
+static OS_STK flash_stk[TASK_STK_SIZE];
 
 static imu_t imu; 
 static float roll, pitch, yaw;
@@ -38,7 +39,6 @@ void task_pos(void *pdata)
 {
     
     position_init(); 
-
     position_calibrate();
 
     while (1) {
@@ -52,8 +52,8 @@ void task_tel(void *pdata)
 {
     while (1)
     {
-        printf("pos:%.2f\n", pos);
-	//printf("3D:%.2f, %.2f, %.2f\n", yaw*57.2958f, -pitch*57.2958f, roll*57.2958f);
+        printf("%.2f,",pos);
+        printf("%.2f,%.2f,%.2f\n", yaw*57.2958f, -pitch*57.2958f, roll*57.2958f);
         CoTickDelay(100);
     }
 }
@@ -71,27 +71,27 @@ void task_led(void *pdata)
         {
             case FC_STATUS_POWER_ON:
             case FC_STATUS_BOOTING:
-                if (tick < 5)      BSP_LED_SetAll(1,0,1); // 紫
+                if (tick < 5)      BSP_LED_SetAll(1,0,1);
                 else               BSP_LED_SetAll(0,0,0);
                 break;
 
             case FC_STATUS_ARMED:
-                if (tick < 10)     BSP_LED_SetAll(0,1,1); // 蓝
+                if (tick < 10)     BSP_LED_SetAll(0,1,1);
                 else               BSP_LED_SetAll(1,1,1);
                 break;
 
             case FC_STATUS_UNARMED:
-                if (tick < 1)      BSP_LED_SetAll(0,1,1); // 蓝
+                if (tick < 1)      BSP_LED_SetAll(0,1,1);
                 else               BSP_LED_SetAll(1,1,1);
                 break;
 
             case FC_STATUS_ERROR:
-                if (tick < 5)      BSP_LED_SetAll(1,0,0); // 红快闪
+                if (tick < 5)      BSP_LED_SetAll(1,0,0);
                 else               BSP_LED_SetAll(0,0,0);
                 break;
 
             case FC_STATUS_FAILSAFE:
-                if (tick % 2)      BSP_LED_SetAll(1,0,1); // 紫快闪
+                if (tick % 2)      BSP_LED_SetAll(1,0,1);
                 else               BSP_LED_SetAll(1,1,1);
                 break;
 
@@ -103,10 +103,20 @@ void task_led(void *pdata)
     }
 }
 
+void task_flash(void *pdata)
+{
+    while (1)
+    {
+        CoTickDelay(1000);
+    }
+}
+
+
 void task_create(void)
 {
-    //CoCreateTask(task_imu, 0, 1,  &imu_stk[TASK_STK_SIZE - 1], TASK_STK_SIZE);
+    CoCreateTask(task_imu, 0, 1,  &imu_stk[TASK_STK_SIZE - 1], TASK_STK_SIZE);
     CoCreateTask(task_tel, 0, 10, &tel_stk[TASK_STK_SIZE - 1], TASK_STK_SIZE);
     CoCreateTask(task_led, 0, 11, &led_stk[TASK_STK_SIZE - 1], TASK_STK_SIZE);
     CoCreateTask(task_pos, 0, 12, &pos_stk[TASK_STK_SIZE - 1], TASK_STK_SIZE);
+    CoCreateTask(task_flash, 0, 13, &flash_stk[TASK_STK_SIZE - 1], TASK_STK_SIZE);
 }

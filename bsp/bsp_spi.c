@@ -1,6 +1,100 @@
 #include "stm32f4xx.h"
 #include "bsp_spi.h"
 
+
+/* =========================================================
+   SPI1  (W25Q128)
+   SCK  = PA5 (AF5)
+   MISO = PA6 (AF5)
+   MOSI = PA7 (AF5)
+   CS   = PA4
+   ========================================================= */
+
+/* ================= SPI1 CS Control ================= */
+
+void bsp_spi1_cs_low(void)
+{
+    GPIOA->BSRR = (1 << (4 + 16));   // PA4 LOW
+}
+
+void bsp_spi1_cs_high(void)
+{
+    GPIOA->BSRR = (1 << 4);          // PA4 HIGH
+}
+
+/* ================= SPI1 Init ================= */
+
+void bsp_spi1_init(bsp_spi_mode_t mode)
+{
+    /* Enable clocks */
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;   // GPIOA clock
+    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;    // SPI1 clock (APB2)
+
+    /* PA5/6/7 AF5 */
+    GPIOA->MODER &= ~(0xFF << (5*2));      // clear PA5,6,7 mode bits (bits 10-15)
+    GPIOA->MODER |=  (0xAA << (5*2));      // set all three to alternate function (10)
+
+    GPIOA->AFR[0] &= ~(0xFFF << 20);       // clear AF bits for PA5 (bit20-23), PA6 (24-27), PA7 (28-31)
+    GPIOA->AFR[0] |=  (5 << 20) | (5 << 24) | (5 << 28);  // AF5 for all
+
+    /* PA4 CS as output */
+    GPIOA->MODER &= ~(3 << (4*2));         // clear PA4 mode bits
+    GPIOA->MODER |=  (1 << (4*2));         // set as output (01)
+    GPIOA->OSPEEDR |= (3 << (4*2));        // high speed
+
+    bsp_spi1_cs_high();                    // default CS high
+
+    /* SPI1 configuration */
+    SPI1->CR1 = 0;
+    SPI1->CR1 |= SPI_CR1_MSTR;             // master mode
+    SPI1->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI; // software slave management
+    SPI1->CR1 |= SPI_CR1_BR_1;              // prescaler 8 (adjust as needed)
+
+    /* Clock polarity/phase */
+    switch(mode)
+    {
+        case SPI_MODE_0:
+            break;
+        case SPI_MODE_1:
+            SPI1->CR1 |= SPI_CR1_CPHA;
+            break;
+        case SPI_MODE_2:
+            SPI1->CR1 |= SPI_CR1_CPOL;
+            break;
+        case SPI_MODE_3:
+            SPI1->CR1 |= SPI_CR1_CPOL | SPI_CR1_CPHA;
+            break;
+    }
+
+    SPI1->CR1 |= SPI_CR1_SPE;               // enable SPI
+}
+
+/* ================= SPI1 Single Byte ================= */
+
+uint8_t bsp_spi1_transfer(uint8_t data)
+{
+    while(!(SPI1->SR & SPI_SR_TXE));
+    SPI1->DR = data;
+
+    while(!(SPI1->SR & SPI_SR_RXNE));
+    return SPI1->DR;
+}
+
+/* ================= SPI1 Burst Transfer ================= */
+
+void bsp_spi1_transfer_buffer(uint8_t *tx, uint8_t *rx, uint16_t len)
+{
+    for(uint16_t i = 0; i < len; i++)
+    {
+        uint8_t send = 0xFF;
+        if(tx) send = tx[i];
+
+        uint8_t recv = bsp_spi1_transfer(send);
+
+        if(rx) rx[i] = recv;
+    }
+}
+
 /* ================= CS Control ================= */
 
 void bsp_spi2_cs_low(void)

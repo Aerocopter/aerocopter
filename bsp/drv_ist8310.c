@@ -1,5 +1,6 @@
 #include "drv_ist8310.h"
 #include "bsp_iic.h"
+#include "delay.h"
 
 /* ================= 常量定义 ================= */
 
@@ -46,7 +47,8 @@ uint8_t drv_ist8310_init(void)
 
     /* 软复位 */
     ist_write(0x0B, 0x01);
-
+    
+    delay_ms(100);
     /* 设置单次测量模式 */
     ist_write(0x0A, 0x01);
 
